@@ -1,0 +1,9 @@
+[user]
+	name = dooke
+	email = me@duke.fr
+[core]
+	excludesfile = /Users/duke/.gitignore
+[merge]
+	tool = opendiff
+[http]
+	sslVerify = true
