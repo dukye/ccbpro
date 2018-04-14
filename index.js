@@ -4,6 +4,8 @@ const rp = require('request-promise');
 const bot = new Discord.Client();
 const api = new Client();
 
+TEST_MODE = false;
+
 // Just run a little http page
 var http = require('http');
 http.createServer(function (req, res) {
@@ -66,3 +68,9 @@ bot.on('message', message => {
 });
 
 bot.login(process.env.DISCORDBOT);
+
+// pings server every 15 minutes to prevent dynos from sleeping
+setInterval(() => {
+  if (!TEST_MODE)
+    https.get('https://discordbot-pro.herokuapp.com/');
+}, 900000);
