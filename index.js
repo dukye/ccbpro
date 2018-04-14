@@ -8,12 +8,11 @@ const api = new Client();
 
 TEST_MODE = false;
 USERNAME = 'duke';
-CHANNEL = 'general';
+CHANNELS_TO_WATCH = ['general', 'discussions'];
 CHANNELS_TO_POST = ['test', 'test2'];
 DOMAIN_TV = 'tradingview.com';
 
 // Just run a little http page
-var http = require('http');
 http.createServer(function (req, res) {
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end('Hello World\n');
@@ -57,6 +56,12 @@ const postOn = (message, channels) => {
   return false;
 };
 
+if (!Array.prototype.inArray) {
+  Array.prototype.inArray = function(element) {
+    return this.indexOf(element) > -1;
+  };
+} 
+
 bot.on('ready', () => {
   console.log('Discord Bot is running...');
 });
@@ -74,23 +79,16 @@ bot.on('message', message => {
   }
 
   console.log(`--> Request from ${user.username} in ${message.channel.name}`);
-  if (user.username === USERNAME && message.channel.name === CHANNEL) {
-    const regCommand = new RegExp(/https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/ig);
-    const matchcommands = msg.match(regCommand);
-
-    // There is an url
-    if (matchcommands.length > 0) {      
-      var matches = matchcommands[0].match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
-      var domain = matches && matches[1].replace('www.', '');
-      
-      // Tradingview ?
-      if (domain === DOMAIN_TV) {
-        // message.channel.send(msg);
-        // message.guild.channels.find('name', 'test').sendMessage(msg);
-        postOn(message, CHANNELS_TO_POST);
-      }
+  if (user.username === USERNAME && CHANNELS_TO_WATCH.inArray(message.channel.name)) {
+    var matches = msg.match(/https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+    var domain = matches && matches[1].replace('www.', '');
+    
+    // Tradingview ?
+    if (domain === DOMAIN_TV) {
+      // message.channel.send(msg);
+      // message.guild.channels.find('name', 'test').sendMessage(msg);
+      postOn(message, CHANNELS_TO_POST);
     }
-
   }
 });
 
