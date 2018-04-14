@@ -81,7 +81,7 @@ bot.on('message', message => {
 
   console.log(`--> Request from ${user.username} in ${message.channel.name}`);
   // FR
-  if (user.username === USERNAME && CHANNELS_TO_WATCH_FR.inArray(message.channel.name)) {
+  if ((user.username == USERNAME || user.username == 'duke') && CHANNELS_TO_WATCH_FR.inArray(message.channel.name)) {
     var matches = msg.match(/https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
     var domain = matches && matches[1].replace('www.', '');
     
@@ -93,7 +93,7 @@ bot.on('message', message => {
     }
   }
   // EN
-  if (user.username === USERNAME && CHANNELS_TO_WATCH_EN.inArray(message.channel.name)) {
+  if ((user.username == USERNAME || user.username == 'duke') && CHANNELS_TO_WATCH_EN.inArray(message.channel.name)) {
     var matches = msg.match(/https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
     var domain = matches && matches[1].replace('www.', '');
     
