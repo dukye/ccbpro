@@ -69,8 +69,7 @@ bot.on('ready', () => {
 });
 
 /**
- * @todo
- * need to simplify url regex into a single condition
+ * Bot message
  */
 bot.on('message', message => {
   const user = message.author;
