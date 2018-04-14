@@ -50,7 +50,7 @@ const makeEmbed = (title, message, elements = []) => {
 const postOn = (message, channels) => {
   if (channels.length > 0) {
     channels.forEach((channel, i) => {
-      message.guild.channels.find('name', 'test').send(message.content);
+      message.guild.channels.find('name', channel).send(message.content);
     });
     return true;
   }
