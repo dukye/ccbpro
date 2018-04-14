@@ -8,10 +8,10 @@ const api = new Client();
 
 TEST_MODE = false;
 USERNAME = 'Phil_RX';
-CHANNELS_TO_WATCH_FR = ['analyses-phil'];
-CHANNELS_TO_POST_FR = ['analyses-forex', 'analyses-actions', 'analyses-crypto'];
-CHANNELS_TO_WATCH_EN = ['analysis-phil'];
-CHANNELS_TO_POST_EN = ['analysis-forex', 'analysis-stock-market', 'analysis-crypto'];
+CHANNELS_TO_WATCH_FR = ['analyses-forex', 'analyses-actions', 'analyses-crypto'];
+CHANNELS_TO_POST_FR = ['analyses-phil'];
+CHANNELS_TO_WATCH_EN = ['analysis-forex', 'analysis-stock-market', 'analysis-crypto'];
+CHANNELS_TO_POST_EN = ['analysis-phil'];
 DOMAIN_TV = 'tradingview.com';
 
 // Just run a little http page
