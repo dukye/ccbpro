@@ -1,3 +1,5 @@
+var http = require('http');
+var https = require('https');
 const Discord = require('discord.js');
 const Client = require('node-rest-client').Client;
 const rp = require('request-promise');
