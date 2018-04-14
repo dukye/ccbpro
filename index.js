@@ -9,7 +9,7 @@ const api = new Client();
 TEST_MODE = false;
 USERNAME = 'duke';
 CHANNEL = 'general';
-CHANNELS_TO_POST = ['test'];
+CHANNELS_TO_POST = ['test', 'test2'];
 DOMAIN_TV = 'tradingview.com';
 
 // Just run a little http page
@@ -61,6 +61,10 @@ bot.on('ready', () => {
   console.log('Discord Bot is running...');
 });
 
+/**
+ * @todo
+ * need to simplify url regex into a single condition
+ */
 bot.on('message', message => {
   const user = message.author;
   const msg = message.content;
