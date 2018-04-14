@@ -7,9 +7,11 @@ const bot = new Discord.Client();
 const api = new Client();
 
 TEST_MODE = false;
-USERNAME = 'duke';
-CHANNELS_TO_WATCH = ['general', 'discussions'];
-CHANNELS_TO_POST = ['test', 'test2'];
+USERNAME = 'Phil_RX';
+CHANNELS_TO_WATCH_FR = ['analyses-phil'];
+CHANNELS_TO_POST_FR = ['analyses-forex', 'analyses-actions', 'analyses-crypto'];
+CHANNELS_TO_WATCH_EN = ['analysis-phil'];
+CHANNELS_TO_POST_EN = ['analysis-forex', 'analysis-stock-market', 'analysis-crypto'];
 DOMAIN_TV = 'tradingview.com';
 
 // Just run a little http page
@@ -79,7 +81,8 @@ bot.on('message', message => {
   }
 
   console.log(`--> Request from ${user.username} in ${message.channel.name}`);
-  if (user.username === USERNAME && CHANNELS_TO_WATCH.inArray(message.channel.name)) {
+  // FR
+  if (user.username === USERNAME && CHANNELS_TO_WATCH_FR.inArray(message.channel.name)) {
     var matches = msg.match(/https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
     var domain = matches && matches[1].replace('www.', '');
     
@@ -87,7 +90,19 @@ bot.on('message', message => {
     if (domain === DOMAIN_TV) {
       // message.channel.send(msg);
       // message.guild.channels.find('name', 'test').sendMessage(msg);
-      postOn(message, CHANNELS_TO_POST);
+      postOn(message, CHANNELS_TO_POST_FR);
+    }
+  }
+  // EN
+  if (user.username === USERNAME && CHANNELS_TO_WATCH_EN.inArray(message.channel.name)) {
+    var matches = msg.match(/https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+    var domain = matches && matches[1].replace('www.', '');
+    
+    // Tradingview ?
+    if (domain === DOMAIN_TV) {
+      // message.channel.send(msg);
+      // message.guild.channels.find('name', 'test').sendMessage(msg);
+      postOn(message, CHANNELS_TO_POST_EN);
     }
   }
 });
