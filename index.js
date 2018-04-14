@@ -73,6 +73,7 @@ bot.login(process.env.DISCORDBOT);
 
 // pings server every 15 minutes to prevent dynos from sleeping
 setInterval(() => {
-  if (!TEST_MODE)
+  if (!TEST_MODE) {
     https.get('https://discordbot-pro.herokuapp.com/');
+  }
 }, 900000);
