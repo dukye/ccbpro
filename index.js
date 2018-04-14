@@ -7,6 +7,10 @@ const bot = new Discord.Client();
 const api = new Client();
 
 TEST_MODE = false;
+USERNAME = 'duke';
+CHANNEL = 'general';
+CHANNELS_TO_POST = ['test'];
+DOMAIN_TV = 'tradingview.com';
 
 // Just run a little http page
 var http = require('http');
@@ -37,6 +41,22 @@ const makeEmbed = (title, message, elements = []) => {
   return embed;
 };
 
+/**
+ * Post on multiple channel
+ * @param  {object} message - discord message instance
+ * @param  {array} channels - array of channels to post on
+ * @return {bool}
+ */
+const postOn = (message, channels) => {
+  if (channels.length > 0) {
+    channels.forEach((channel, i) => {
+      message.guild.channels.find('name', 'test').send(message.content);
+    });
+    return true;
+  }
+  return false;
+};
+
 bot.on('ready', () => {
   console.log('Discord Bot is running...');
 });
@@ -50,7 +70,7 @@ bot.on('message', message => {
   }
 
   console.log(`--> Request from ${user.username} in ${message.channel.name}`);
-  if (user.username == 'duke') {
+  if (user.username === USERNAME && message.channel.name === CHANNEL) {
     const regCommand = new RegExp(/https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/ig);
     const matchcommands = msg.match(regCommand);
 
@@ -60,9 +80,10 @@ bot.on('message', message => {
       var domain = matches && matches[1].replace('www.', '');
       
       // Tradingview ?
-      if (domain === 'tradingview.com') {
+      if (domain === DOMAIN_TV) {
         // message.channel.send(msg);
-        message.guild.channels.find('name', 'test').sendMessage(msg);
+        // message.guild.channels.find('name', 'test').sendMessage(msg);
+        postOn(message, CHANNELS_TO_POST);
       }
     }
 
