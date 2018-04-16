@@ -43,6 +43,14 @@ const makeEmbed = (title, message, elements = []) => {
 };
 
 /**
+ * Timestamp to HumanReadable date
+ */
+function getDateTimeFromTimestamp(unixTimeStamp) {
+  var date = new Date(unixTimeStamp);
+  return ('0' + date.getDate()).slice(-2) + '/' + ('0' + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear() + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
+}
+
+/**
  * Post on multiple channel
  * @param  {object} message - discord message instance
  * @param  {array} channels - array of channels to post on
@@ -103,6 +111,39 @@ bot.on('message', message => {
       // message.guild.channels.find('name', 'test').sendMessage(msg);
       postOn(message, CHANNELS_TO_POST_EN);
     }
+  }
+
+  /**
+   * Reply to ...
+   */
+  const regCommand = new RegExp(/^!(reply)\ (\d+)\ ((.*)+)$/i);
+  const matchcommands = msg.match(regCommand);
+  if (matchcommands) {
+    const command = matchcommands[1];
+    const id = matchcommands[2];
+    const paramsString = matchcommands[3];
+
+    console.log(command, id, paramsString);
+    
+    const mainMessage = message;
+    message.channel.fetchMessage(id)
+      .then(message => {
+        const embed = new Discord.RichEmbed()
+        .setTitle(`In reply to ${message.author.username}`)
+        // .setAuthor('CryptoBot', 'http://www.scpc.org.au/wp-content/uploads/2016/10/rocketkid-1024x682.jpg')
+        .setColor(0x4671ed)
+        .setDescription(message.content)
+        // .setTimestamp()
+        .setFooter('-- initialy posted at ' + getDateTimeFromTimestamp(message.createdTimestamp));
+
+        mainMessage.channel.send(embed);
+        mainMessage.channel.send(paramsString);
+      })
+      .catch(console.log);
+
+    message.delete()
+      .then(msg => console.log(`Deleted message from ${msg.author.username}`))
+      .catch(console.error);
   }
 });
 
