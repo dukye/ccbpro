@@ -130,14 +130,14 @@ bot.on('message', message => {
       .then(message => {
         const embed = new Discord.RichEmbed()
         .setTitle(`In reply to ${message.author.username}`)
-        // .setAuthor('CryptoBot', 'http://www.scpc.org.au/wp-content/uploads/2016/10/rocketkid-1024x682.jpg')
         .setColor(0x6ab1f1)
         .setDescription(message.content)
         // .setTimestamp()
         .setFooter('-- initialy posted at ' + getDateTimeFromTimestamp(message.createdTimestamp));
 
         mainMessage.channel.send(embed);
-        mainMessage.channel.send(paramsString);
+        // mainMessage.channel.send(`From: ${mainMessage.author.username} ` + paramsString);
+        message.reply(paramsString);
       })
       .catch(console.log);
 
