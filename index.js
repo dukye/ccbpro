@@ -139,12 +139,14 @@ bot.on('message', message => {
         mainMessage.channel.send(embed);
         // mainMessage.channel.send(`From: ${mainMessage.author.username} ` + paramsString);
         message.reply(paramsString);
+
+        mainMessage.edit(paramsString);
       })
       .catch(console.log);
 
-    message.delete()
-      .then(msg => console.log(`Deleted message from ${msg.author.username}`))
-      .catch(console.error);
+    // message.delete()
+    //   .then(msg => console.log(`Deleted message from ${msg.author.username}`))
+    //   .catch(console.error);
   }
 });
 
