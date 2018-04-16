@@ -131,6 +131,7 @@ bot.on('message', message => {
       .then(message => {
         const embed = new Discord.RichEmbed()
         .setTitle(`In reply to ${message.author.username}`)
+        .setAuthor(mainMessage.author.username, mainMessage.author.avatarURL)
         .setColor(0x6ab1f1)
         .setDescription(message.content)
         // .setTimestamp()
@@ -139,14 +140,12 @@ bot.on('message', message => {
         mainMessage.channel.send(embed);
         // mainMessage.channel.send(`From: ${mainMessage.author.username} ` + paramsString);
         message.reply(paramsString);
-
-        mainMessage.edit(paramsString);
       })
       .catch(console.log);
 
-    // message.delete()
-    //   .then(msg => console.log(`Deleted message from ${msg.author.username}`))
-    //   .catch(console.error);
+    message.delete()
+      .then(msg => console.log(`Deleted message from ${msg.author.username}`))
+      .catch(console.error);
   }
 });
 
