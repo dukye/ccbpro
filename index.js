@@ -135,7 +135,7 @@ bot.on('message', message => {
         .setColor(0x6ab1f1)
         .setDescription(message.content)
         // .setTimestamp()
-        .setFooter('-- initialy posted at ' + getDateTimeFromTimestamp(message.createdTimestamp));
+        .setFooter('-- ' + getDateTimeFromTimestamp(message.createdTimestamp));
 
         mainMessage.channel.send(embed);
         // mainMessage.channel.send(`From: ${mainMessage.author.username} ` + paramsString);
