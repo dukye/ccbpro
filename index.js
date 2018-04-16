@@ -87,7 +87,7 @@ bot.on('message', message => {
     message.reply('pong');
   }
 
-  console.log(`--> Request from ${user.username} in ${message.channel.name}`);
+  // console.log(`--> Request from ${user.username} in ${message.channel.name}`);
   // FR
   if ((user.username == USERNAME || user.username == 'duke') && CHANNELS_TO_WATCH_FR.inArray(message.channel.name)) {
     var matches = msg.match(/https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
@@ -126,10 +126,12 @@ bot.on('message', message => {
     console.log(command, id, paramsString);
     
     const mainMessage = message;
+    console.log(mainMessage);
     message.channel.fetchMessage(id)
       .then(message => {
         const embed = new Discord.RichEmbed()
         .setTitle(`In reply to ${message.author.username}`)
+        .setAuthor(mainMessage.author.username, mainMessage.author.avatar)
         .setColor(0x6ab1f1)
         .setDescription(message.content)
         // .setTimestamp()
@@ -141,9 +143,9 @@ bot.on('message', message => {
       })
       .catch(console.log);
 
-    message.delete()
-      .then(msg => console.log(`Deleted message from ${msg.author.username}`))
-      .catch(console.error);
+    // message.delete()
+    //   .then(msg => console.log(`Deleted message from ${msg.author.username}`))
+    //   .catch(console.error);
   }
 });
 
