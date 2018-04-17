@@ -1,3 +1,10 @@
+const express = require('express')
+const app = express()
+const cheerio = require('cheerio')
+const RSS = require('rss');
+const request = require('request');
+const resolveRelative = require('resolve-relative-url');
+
 var http = require('http');
 var https = require('https');
 const Discord = require('discord.js');
@@ -14,12 +21,88 @@ CHANNELS_TO_WATCH_EN = ['analysis-forex', 'analysis-stock-market', 'analysis-cry
 CHANNELS_TO_POST_EN = ['analysis-phil'];
 DOMAIN_TV = 'tradingview.com';
 
+/**
+ * [description]
+ * @param  {[type]} req  [description]
+ * @param  {[type]} res) {             res.send('hello world');} [description]
+ * @return {[type]}      [description]
+ */
+app.get('/', function(req, res) {
+  res.send('hello world');
+});
+
+app.get('/rss', (req, res) => {
+    var usersRequested = (req.query.users || 'PRO_Indicators').split(',')
+    const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
+    var feedItems = []
+
+    var doneRequests = 0;
+    
+    for (let userIndex in usersRequested) {
+        var user = usersRequested[userIndex]
+        console.log('Running for ' + user)
+        request('https://www.tradingview.com/u/' + user, function (error, response, html) {
+            if (!error && response.statusCode == 200) {
+                const $ = cheerio.load(html);
+
+                $('.js-feed-item .js-widget-idea').each(function(i, element) {
+                    const title = $(this).find('.tv-widget-idea__title-name').text().trim()
+                    const url = resolveRelative($(this).find('.tv-widget-idea__title').attr('href'), response.request.uri.href)
+                    const author = $(this).find('.tv-user-link__name').text().trim()
+                    const date = parseInt($(this).find('.tv-widget-idea__time').attr('data-timestamp'), 10) * 1000
+                    const image = $(this).find('.tv-widget-idea__cover-link img').attr('src')
+                    const description = $(this).find('.tv-widget-idea__description-text').text().trim()
+                            + '<br /><img src="' + image + '" />'
+
+                    const feedItem = {
+                        title: title,
+                        description: description,
+                        url: url,
+                        author: author,
+                        date: date
+                    }
+
+                    feedItems.push(feedItem)
+                })
+
+            }
+
+            doneRequests++;
+            if (doneRequests == usersRequested.length) {
+                // Sort items by date
+                feedItems = feedItems.sort((a,b) => {
+                    return b.date - a.date
+                })
+
+                // Add to feed
+                const feed = new RSS({
+                    title: 'TradingView Ideas',
+                    feed_url: fullUrl,
+                    site_url: fullUrl
+                });
+                feedItems.forEach(item => feed.item(item))
+
+                // Output
+                console.log('Done')
+                res.set('Content-Type', 'application/rss+xml');
+                res.send(feed.xml({indent: true}))
+            }
+        });
+    }
+})
+
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+    console.log('Started at :' + PORT)
+})
+
+
 // Just run a little http page
-http.createServer(function (req, res) {
-  res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.end('Hello World\n');
-}).listen(process.env.PORT || 8080);
-console.log('HTTP Server running & listening...');
+// http.createServer(function (req, res) {
+//   res.writeHead(200, {'Content-Type': 'text/plain'});
+//   res.end('Hello World\n');
+// }).listen(process.env.PORT || 8080);
+// console.log('HTTP Server running & listening...');
 
 /**
  * Rich embed discord
