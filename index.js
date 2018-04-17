@@ -40,54 +40,56 @@ app.get('/rss', (req, res) => {
     
     for (let userIndex in usersRequested) {
         var user = usersRequested[userIndex]
-        console.log('Running for ' + user)
-        request('https://www.tradingview.com/u/' + user, function (error, response, html) {
-            if (!error && response.statusCode == 200) {
-                const $ = cheerio.load(html);
+        if (typeof user === 'string') {
+          console.log('Running for ' + user)
+          request('https://www.tradingview.com/u/' + user, function (error, response, html) {
+              if (!error && response.statusCode == 200) {
+                  const $ = cheerio.load(html);
 
-                $('.js-feed-item .js-widget-idea').each(function(i, element) {
-                    const title = $(this).find('.tv-widget-idea__title-name').text().trim()
-                    const url = resolveRelative($(this).find('.tv-widget-idea__title').attr('href'), response.request.uri.href)
-                    const author = $(this).find('.tv-user-link__name').text().trim()
-                    const date = parseInt($(this).find('.tv-widget-idea__time').attr('data-timestamp'), 10) * 1000
-                    const image = $(this).find('.tv-widget-idea__cover-link img').attr('src')
-                    const description = $(this).find('.tv-widget-idea__description-text').text().trim()
-                            + '<br /><img src="' + image + '" />'
+                  $('.js-feed-item .js-widget-idea').each(function(i, element) {
+                      const title = $(this).find('.tv-widget-idea__title-name').text().trim()
+                      const url = resolveRelative($(this).find('.tv-widget-idea__title').attr('href'), response.request.uri.href)
+                      const author = $(this).find('.tv-user-link__name').text().trim()
+                      const date = parseInt($(this).find('.tv-widget-idea__time').attr('data-timestamp'), 10) * 1000
+                      const image = $(this).find('.tv-widget-idea__cover-link img').attr('src')
+                      const description = $(this).find('.tv-widget-idea__description-text').text().trim()
+                              + '<br /><img src="' + image + '" />'
 
-                    const feedItem = {
-                        title: title,
-                        description: description,
-                        url: url,
-                        author: author,
-                        date: date
-                    }
+                      const feedItem = {
+                          title: title,
+                          description: description,
+                          url: url,
+                          author: author,
+                          date: date
+                      }
 
-                    feedItems.push(feedItem)
-                })
+                      feedItems.push(feedItem)
+                  })
 
-            }
+              }
 
-            doneRequests++;
-            if (doneRequests == usersRequested.length) {
-                // Sort items by date
-                feedItems = feedItems.sort((a,b) => {
-                    return b.date - a.date
-                })
+              doneRequests++;
+              if (doneRequests == usersRequested.length) {
+                  // Sort items by date
+                  feedItems = feedItems.sort((a,b) => {
+                      return b.date - a.date
+                  })
 
-                // Add to feed
-                const feed = new RSS({
-                    title: 'TradingView Ideas',
-                    feed_url: fullUrl,
-                    site_url: fullUrl
-                });
-                feedItems.forEach(item => feed.item(item))
+                  // Add to feed
+                  const feed = new RSS({
+                      title: 'TradingView Ideas',
+                      feed_url: fullUrl,
+                      site_url: fullUrl
+                  });
+                  feedItems.forEach(item => feed.item(item))
 
-                // Output
-                console.log('Done')
-                res.set('Content-Type', 'application/rss+xml');
-                res.send(feed.xml({indent: true}))
-            }
-        });
+                  // Output
+                  console.log('Done')
+                  res.set('Content-Type', 'application/rss+xml');
+                  res.send(feed.xml({indent: true}))
+              }
+          });
+        }
     }
 })
 
