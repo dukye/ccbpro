@@ -15,7 +15,7 @@ const api = new Client();
 
 TEST_MODE = false;
 USERNAME = 'Phil_RX';
-CHANNELS_TO_WATCH_FR = ['analyses-forex', 'analyses-actions', 'analyses-crypto'];
+CHANNELS_TO_WATCH_FR = ['analyses-forex', 'analyses-actions', 'analyses-crypto', 'analyses-altcoins'];
 CHANNELS_TO_POST_FR = ['analyses-phil'];
 CHANNELS_TO_WATCH_EN = ['analysis-forex', 'analysis-stock-market', 'analysis-crypto'];
 CHANNELS_TO_POST_EN = ['analysis-phil'];
@@ -37,7 +37,7 @@ app.get('/rss', (req, res) => {
     var feedItems = []
 
     var doneRequests = 0;
-    
+
     for (let userIndex in usersRequested) {
         var user = usersRequested[userIndex]
         if (typeof user === 'string') {
@@ -155,10 +155,65 @@ if (!Array.prototype.inArray) {
   Array.prototype.inArray = function(element) {
     return this.indexOf(element) > -1;
   };
-} 
+}
 
 bot.on('ready', () => {
   console.log('Discord Bot is running...');
+});
+
+
+bot.on('guildMemberAdd', (member) => {
+  // console.log(`Hello new user ${member.username}`);
+  const theUserId = member.user.id;
+  console.log('UserID: ', theUserId);
+
+  // console.log(guild.guild.channels.get('432624917217935389'));
+  const welcomeChannel = member.guild.channels.find('name', 'welcome');
+
+  welcomeChannel.send(`Welcome <@${theUserId}> check your private message for instructions (on top left of discord app) / Bienvenue <@${theUserId}> veuillez regarder vos messages privés pour suivre les instructions (en haut à gauche de l'application discord)`);
+  member.user.send(`
+Welcome on discord of / Bienvenue sur le serveur discord: **PRO Indicators** 😉
+
+__Introduction__
+If you're a beginner, here is a short video explaining how to use our discord / Pour les débutants, voici une courte vidéo de présentation sur l'utilisation de discord:
+For english users: https://www.youtube.com/watch?v=6a60eUKpvQQ
+Vidéo en français: https://www.youtube.com/watch?v=Paol3_MOvWM
+
+
+__Next step / Prochaine étape:__
+You need to choose your language AND your interests in <#${welcomeChannel.id}> channel by typing on of these commands below / Vous devez choisir votre langue ET vos intérêts dans le salon <#${welcomeChannel.id}> en tapant une des commandes ci dessous.
+First prefixed parameter is the language and second the interest separated by a "-" (hyphen sign) / Le premier paramètre préfixé est votre langue et le second celui de votre intérêt chacun séparé par un "-" (le signe tiret de votre clavier)
+
+
+ENGLISH - Here are different possibilities
+----
+1. __Crypto Analysis Channel__
+> type: \`\`!en-crypto\`\`
+
+2. __Stock market Analysis channel__
+>type: \`\`!en-stock\`\`
+
+3. __Forex Analysis channel:__
+> type: \`\`!en-forex\`\`
+
+4. __Crypto + Stock + Forex:__
+> type: \`\`!en-all\`\`
+
+
+FRANCAIS - Voici les différentes possibilités:
+----
+1. __Analyse Crypto__
+> tapez: \`\`!fr-crypto\`\`
+
+2. __Analyse Marché des actions__
+> tapez: \`\`!fr-stock\`\`
+
+3. __Analyse Forex:__
+> tapez: \`\`!fr-forex\`\`
+
+4. __Analyse Crypto + Actions + Forex:__
+> tapez: \`\`!fr-all\`\`
+  `);
 });
 
 /**
@@ -177,7 +232,7 @@ bot.on('message', message => {
   if ((user.username == USERNAME || user.username == 'duke') && CHANNELS_TO_WATCH_FR.inArray(message.channel.name)) {
     var matches = msg.match(/https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
     var domain = matches && matches[1].replace('www.', '');
-    
+
     // Tradingview ?
     if (domain === DOMAIN_TV) {
       // message.channel.send(msg);
@@ -189,13 +244,216 @@ bot.on('message', message => {
   if ((user.username == USERNAME || user.username == 'duke') && CHANNELS_TO_WATCH_EN.inArray(message.channel.name)) {
     var matches = msg.match(/https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
     var domain = matches && matches[1].replace('www.', '');
-    
+
     // Tradingview ?
     if (domain === DOMAIN_TV) {
       // message.channel.send(msg);
       // message.guild.channels.find('name', 'test').sendMessage(msg);
       postOn(message, CHANNELS_TO_POST_EN);
     }
+  }
+
+  /**
+   * Muted custom command
+   */
+  var guildRoles = message.guild.roles;
+  var mutedRole = guildRoles.find('name', 'Muted');
+  if (message.member && message.member.roles && message.member.roles.has(mutedRole.id)) {
+    message.delete();
+  }
+
+  /**
+   * All roles
+   * @type {[type]}
+   */
+  // var roles = message.guild.roles
+  // roles.forEach(function (role) {
+  //   console.log(role.name, role.id);
+  // });
+
+  /**
+   * All users!
+   */
+  // let users = bot.users;
+  // users.forEach(function (user) {
+  //   console.log(user.username, user.id);
+  // });
+
+  /**
+   * Tests
+   */
+  console.log(`--> Request from ${user.username} [${user.id}] in ${message.channel.name}`);
+  // console.log('FR', message.member.roles.has(roleFR.id))
+  // console.log('FR-FOREX', message.member.roles.has(roleFrForex.id))
+  // console.log('FR-CRYPTO', message.member.roles.has(roleFrCrypto.id))
+  // console.log('FR-STOCK', message.member.roles.has(roleFrStock.id))
+  // console.log('FR-STOCK', message.member.roles.has(roleFrStock.id, fakeRole.id))
+
+  /**
+   * Give roles/rights to member
+   * @type {RegExp}
+   */
+  const regCommandMember = new RegExp(/^!(member)\ (\d+) (fr-all|fr-stock|fr-forex|fr-crypto|en-all|en-stock|en-forex|en-crypto)$/i);
+  const matchcommandMember = msg.match(regCommandMember);
+  if (matchcommandMember) {
+
+    console.log('------ Custom command')
+    const command = matchcommandMember[1];
+    const userid = matchcommandMember[2];
+    const right = matchcommandMember[3];
+
+    var guildRoles = message.guild.roles;
+    var fakeRole = guildRoles.find('name', 'fakeRole');
+
+    // Fr roles
+    var roleFR = guildRoles.find('name', 'french');
+    var roleFrForex = guildRoles.find('name', 'fr-forex');
+    var roleFrCrypto = guildRoles.find('name', 'fr-crypto');
+    var roleFrStock = guildRoles.find('name', 'fr-stock');
+
+    // En roles
+    var roleEN = guildRoles.find('name', 'english');
+    var roleEnForex = guildRoles.find('name', 'en-forex');
+    var roleEnCrypto = guildRoles.find('name', 'en-crypto');
+    var roleEnStock = guildRoles.find('name', 'en-stock');
+
+    var roleAdmin = guildRoles.find('name', 'Admin');
+    var roleGeneral = guildRoles.find('name', 'General');
+    var roleSergent = guildRoles.find('name', 'Sergent');
+    var roleModerator = guildRoles.find('name', 'Moderator');
+    var roleColonel = guildRoles.find('name', 'Colonel');
+
+    if (message.member.roles.has(roleGeneral.id, roleSergent.id, roleModerator.id, roleColonel.id)) {
+      const userguild = message.guild.members.get(userid);
+
+      // console.log(userguild.user);
+      // // console.log(userguild.roles);
+      // const userroles = userguild.roles;
+      // userroles.forEach(function (role) {
+      //   console.log(role.name, ' [',role.id, ']');
+      // });
+      // console.log('fakeRole ', fakeRole.id, userguild.roles.has(fakeRole.id))
+      // console.log('set Role ')
+      // userguild.addRole(fakeRole.id)
+      //   .then((msg) => {
+      //     message.reply('done');
+      //   });
+      // console.log('fakeRole ', fakeRole.id, userguild.roles.has(fakeRole.id))
+      // console.log('2 roles ', userguild.roles.has(roleFR.id, fakeRole.id))
+      // console.log('------ End');
+
+      switch(right) {
+        case 'fr-stock':
+        case 'fr-forex':
+        case 'fr-crypto':
+          let currentRoleFr = guildRoles.find('name', right);
+          userguild.addRoles([roleFR.id, currentRoleFr.id])
+          .then((msg) => {
+            console.log('reply fr xx')
+            message.reply('done');
+          })
+          .catch((e) => null);
+          break;
+        case 'fr-all':
+          userguild.addRoles([roleFR.id, roleFrStock.id, roleFrForex.id, roleFrCrypto.id])
+          .then((msg) => {
+            console.log('reply fr all')
+            message.reply('done');
+          })
+          .catch((e) => null);
+          break;
+        case 'en-stock':
+        case 'en-forex':
+        case 'en-crypto':
+          let currentRoleEn = guildRoles.find('name', right);
+          userguild.addRoles([roleEN.id, currentRoleEn.id])
+          .then((msg) => {
+            console.log('reply en xx')
+            message.reply('done');
+          })
+          .catch((e) => null);
+          break;
+        case 'en-all':
+          console.log('OK Valid');
+          userguild.addRoles([roleEN.id, roleEnStock.id, roleEnForex.id, roleEnCrypto.id])
+          .then((msg) => {
+            console.log('reply en all')
+            message.reply('done');
+          })
+          .catch((e) => null);
+          break;
+      }
+    }
+  }
+
+  /**
+   * Add roles
+   * @type {RegExp}
+   */
+  const regCommandRole = new RegExp(/^!(fr-all|fr-stock|fr-forex|fr-crypto|en-all|en-stock|en-forex|en-crypto)$/i);
+  const matchcommandRole = msg.match(regCommandRole);
+  if (matchcommandRole && message.channel.name == 'welcome') {
+    const command = matchcommandRole[1];
+    console.log(command);
+
+    var guildRoles = message.guild.roles;
+
+    // Fr roles
+    var roleFR = guildRoles.find('name', 'french');
+    var roleFrForex = guildRoles.find('name', 'fr-forex');
+    var roleFrCrypto = guildRoles.find('name', 'fr-crypto');
+    var roleFrStock = guildRoles.find('name', 'fr-stock');
+
+    // En roles
+    var roleEN = guildRoles.find('name', 'english');
+    var roleEnForex = guildRoles.find('name', 'en-forex');
+    var roleEnCrypto = guildRoles.find('name', 'en-crypto');
+    var roleEnStock = guildRoles.find('name', 'en-stock');
+
+    const userguild = message.guild.members.get(user.id);
+
+    switch(command) {
+      case 'fr-stock':
+      case 'fr-forex':
+      case 'fr-crypto':
+        let currentRoleFr = guildRoles.find('name', command);
+        userguild.addRoles([roleFR.id, currentRoleFr.id])
+        .then((msg) => {
+          console.log('reply fr xx')
+          // message.reply('done');
+        })
+        .catch((e) => null);
+        break;
+      case 'fr-all':
+        userguild.addRoles([roleFR.id, roleFrStock.id, roleFrForex.id, roleFrCrypto.id])
+        .then((msg) => {
+          console.log('reply fr all')
+          // message.reply('done');
+        })
+        .catch((e) => null);
+        break;
+      case 'en-stock':
+      case 'en-forex':
+      case 'en-crypto':
+        let currentRoleEn = guildRoles.find('name', command);
+        userguild.addRoles([roleEN.id, currentRoleEn.id])
+        .then((msg) => {
+          console.log('reply en xx')
+          // message.reply('done');
+        })
+        .catch((e) => null);
+        break;
+      case 'en-all':
+        console.log('OK Valid');
+        userguild.addRoles([roleEN.id, roleEnStock.id, roleEnForex.id, roleEnCrypto.id])
+        .then((msg) => {
+          console.log('reply en all')
+          // message.reply('done');
+        })
+        .catch((e) => null);
+        break;
+    }
+    message.delete()
   }
 
   /**
@@ -208,10 +466,10 @@ bot.on('message', message => {
     const id = matchcommands[2];
     const paramsString = matchcommands[3];
 
-    console.log(command, id, paramsString);
-    
+    // console.log(command, id, paramsString);
+
     const mainMessage = message;
-    console.log(mainMessage);
+    // console.log(mainMessage);
     message.channel.fetchMessage(id)
       .then(message => {
         const embed = new Discord.RichEmbed()
@@ -232,6 +490,7 @@ bot.on('message', message => {
       .then(msg => console.log(`Deleted message from ${msg.author.username}`))
       .catch(console.error);
   }
+
 });
 
 bot.login(process.env.DISCORDBOT);
